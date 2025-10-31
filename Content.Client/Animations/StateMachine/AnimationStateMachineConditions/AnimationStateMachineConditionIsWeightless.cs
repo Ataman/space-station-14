@@ -9,7 +9,7 @@ using Robust.Shared.Physics.Components;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
-public sealed partial class AnimationStateMachineIsWeightlessCondition : AnimationStateMachineCondition
+public sealed partial class AnimationStateMachineConditionIsWeightless : AnimationStateMachineConditionBase
 {
     private GravitySystem _gravitySystem = null!;
 

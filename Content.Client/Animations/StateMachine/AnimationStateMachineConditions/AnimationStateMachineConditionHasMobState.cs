@@ -3,7 +3,7 @@ using Content.Shared.Mobs.Systems;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
-public sealed partial class AnimationStateMachineHasMobStateCondition : AnimationStateMachineCondition
+public sealed partial class AnimationStateMachineConditionHasMobState : AnimationStateMachineConditionBase
 {
     [DataField]
     public MobState State = MobState.Invalid;

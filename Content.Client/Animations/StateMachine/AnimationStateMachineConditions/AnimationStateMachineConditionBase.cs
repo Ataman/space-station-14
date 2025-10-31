@@ -1,7 +1,9 @@
+using System.Runtime.CompilerServices;
+
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
 [ImplicitDataDefinitionForInheritors]
-public abstract partial class AnimationStateMachineCondition
+public abstract partial class AnimationStateMachineConditionBase
 {
     internal bool LastResult = false;
 

@@ -9,7 +9,7 @@ using Robust.Shared.Physics.Components;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
-public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationStateMachineCondition
+public sealed partial class AnimationStateMachineConditionIsWalking : AnimationStateMachineConditionBase
 {
     private enum MovementType
     {

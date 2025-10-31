@@ -10,7 +10,7 @@ public abstract partial class AnimationStateMachineState
     /// A collection of conditions that must be true for this state to activate.
     /// </summary>
     [DataField]
-    public AnimationStateMachineCondition[] Conditions = [];
+    public AnimationStateMachineConditionBase[] Conditions = [];
 
     /// <summary>
     /// A collection of triggers that cause a conditions check.
