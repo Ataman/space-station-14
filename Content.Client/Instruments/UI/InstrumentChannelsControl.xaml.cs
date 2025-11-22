@@ -41,7 +41,10 @@ public sealed partial class InstrumentChannelsControl : Control
     private void UpdateRenderer()
     {
         if (_currentRenderer != null)
+        {
             _currentRenderer.OnMidiEvent -= OnMidiEvent;
+            _currentRenderer = null;
+        }
 
         if (!_entity.Valid)
             return;
