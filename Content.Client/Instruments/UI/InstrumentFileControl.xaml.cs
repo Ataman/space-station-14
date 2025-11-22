@@ -57,6 +57,7 @@ public sealed partial class InstrumentFileControl : InstrumentMidiSourceControl
     {
         PlayButton.Pressed = false;
         StopPlaying();
+        CurrentTrackLabel.Text = "No track selected...";
         base.ClearInstrument();
     }
 
@@ -143,7 +144,6 @@ public sealed partial class InstrumentFileControl : InstrumentMidiSourceControl
 
         EntManager.System<InstrumentSystem>().CloseMidi(Entity, false, instrument);
         ResetTrackIndicators();
-        CurrentTrackLabel.Text = "No track selected...";
     }
 
     private void PlayButton_OnToggled(ButtonToggledEventArgs obj)

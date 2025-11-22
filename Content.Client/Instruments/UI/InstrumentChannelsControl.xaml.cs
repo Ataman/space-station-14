@@ -57,11 +57,22 @@ public sealed partial class InstrumentChannelsControl : Control
     public void SetInstrument(EntityUid entity)
     {
         _entity = entity;
+        var instrument = _entityManager.GetComponent<InstrumentComponent>(_entity);
+        if (instrument != null)
+            instrument.OnMidiPlaybackEnded += Instrument_OnMidiPlaybackEnded;
         UpdateRenderer();
+    }
+
+    private void Instrument_OnMidiPlaybackEnded()
+    {
+        ChannelList.Clear();
     }
 
     public void ClearInstrument()
     {
+        var instrument = _entityManager.GetComponent<InstrumentComponent>(_entity);
+        if (instrument != null)
+            instrument.OnMidiPlaybackEnded -= Instrument_OnMidiPlaybackEnded;
         _entity = EntityUid.Invalid;
         UpdateRenderer();
     }
