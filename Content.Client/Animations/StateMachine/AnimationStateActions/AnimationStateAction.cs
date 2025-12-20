@@ -7,5 +7,4 @@ public abstract partial class AnimationStateAction
 {
     public abstract string AnimationKey { get; }
     public abstract Animation CreateAnimation(AppearanceSystem appearanceSystem, EntityUid entity);
-    public abstract Animation StopAnimation(AppearanceSystem appearanceSystem, EntityUid entity);
 }

@@ -1,26 +1,55 @@
+using Content.Client.Animations.StateMachine.AnimationStateActions;
+using Content.Shared.Movement.Components;
+using Content.Shared.Movement.Events;
+using Content.Shared.Movement.Systems;
+using Content.Shared.Trigger;
+using Content.Shared.Trigger.Components.Effects;
+using Content.Shared.Trigger.Components.Triggers;
 using Robust.Client.GameObjects;
+using Robust.Client.Timing;
+using Robust.Shared.GameStates;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Timing;
 
 namespace Content.Client.Animations.StateMachine;
 
 public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStateMachineComponent>
 {
     [Dependency] private readonly ILogManager _logger = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
     private ISawmill _sawmill = default!;
 
-    private readonly List<EntityUid> _activeStateMachines = [];
-    private readonly Dictionary<EntityUid, AnimationState> _activeStates = new();
+    private const float UpdateInterval = 0.1f;
 
     public override void Initialize()
     {
         base.Initialize();
 
         _sawmill = _logger.GetSawmill("asm");
-        _sawmill.Log(LogLevel.Debug, "ASM-System initialized");
 
-        SubscribeLocalEvent<AnimationStateMachineComponent, ComponentShutdown>(OnAnimationStateMachineShutdown);
-        SubscribeLocalEvent<AnimationStateMachineComponent, ComponentStartup>(OnAnimationStateMachineInit);
+        SubscribeLocalEvent<AnimationStateMachineComponent, ComponentInit>(OnAnimationStateMachineComponentInit);
+        SubscribeLocalEvent<AnimationStateMachineComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<AnimationPlayerComponent, AnimationCompletedEvent>(OnAnimationCompleted);
+
+        SubscribeLocalEvent<InputMoverComponent, MoveInputEvent>(OnMoveInputEvent);
+    }
+
+    private void OnMoveInputEvent(Entity<InputMoverComponent> ent, ref MoveInputEvent args)
+    {
+        _sawmill.Debug($"Ent[{ent.Owner.Id}] - MoveInputEvent: HasDirectionalMovement={args.HasDirectionalMovement}, OldMovement={args.OldMovement}");
+    }
+
+    private void OnMapInit(EntityUid uid, AnimationStateMachineComponent comp, MapInitEvent init)
+    {
+        comp.NextUpdate = _timing.CurTime + TimeSpan.FromSeconds(UpdateInterval);
+    }
+
+    internal bool OnTrigger(AnimationState state, Entity<AnimationStateMachineComponent> entity)
+    {
+        if (!EvaluateConditions(entity, state))
+            return false;
+        SwitchState(entity, state);
+        return true;
     }
 
     private void OnAnimationCompleted(Entity<AnimationPlayerComponent> ent, ref AnimationCompletedEvent args)
@@ -29,21 +58,21 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         if (!TryComp<AnimationStateMachineComponent>(ent, out var comp))
             return;
 
-        if (_activeStates.TryGetValue(ent, out var state) && state.Action.AnimationKey.Equals(args.Key))
-            AnimationSystem.Play(ent, state.Action.CreateAnimation(AppearanceSystem, ent), state.Action.AnimationKey);
+        // Action without conditions is the default state, don't replay it.
+        if (comp.ActiveState.Action.AnimationKey == args.Key &&
+            comp.ActiveState != comp.DefaultState &&
+            EvaluateConditions((ent, comp), comp.ActiveState))
+            AnimationSystem.Play(ent, comp.ActiveState.Action.CreateAnimation(AppearanceSystem, ent), comp.ActiveState.Action.AnimationKey);
     }
 
-    private void OnAnimationStateMachineShutdown(Entity<AnimationStateMachineComponent> ent, ref ComponentShutdown args)
+    private void OnAnimationStateMachineComponentInit(Entity<AnimationStateMachineComponent> ent, ref ComponentInit args)
     {
-        ExitState(ent);
-        _activeStateMachines.Remove(ent);
-    }
-
-    private void OnAnimationStateMachineInit(EntityUid ent, AnimationStateMachineComponent component, ComponentStartup args)
-    {
-        _activeStateMachines.Add(ent);
-        foreach (var state in component.States)
+        foreach (var state in ent.Comp.States)
         {
+            // TODO: Add more info to error message.
+            if (state.Conditions.Length == 0)
+                _sawmill.Error("Every AnimationState must have at least one condition.");
+
             foreach (var cond in state.Conditions)
             {
                 cond.Initialize(EntityManager);
@@ -54,68 +83,64 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
-        foreach (var ent in _activeStateMachines)
+
+        var query = EntityQueryEnumerator<AnimationStateMachineComponent>();
+        while (query.MoveNext(out var ent, out var comp))
         {
-            UpdateStateMachine(ent);
+            if (comp.NextUpdate > _timing.CurTime)
+                continue;
+
+            UpdateStateMachine((ent, comp));
+
+            comp.NextUpdate += TimeSpan.FromSeconds(UpdateInterval);
         }
     }
 
-    private void EnterState(EntityUid ent, AnimationState state)
+    private void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationState state)
     {
-        if (_activeStates.TryGetValue(ent, out var currentState) && currentState == state)
-            return;
-        ExitState(ent);
-        AnimationSystem.Play(ent, state.Action.CreateAnimation(AppearanceSystem, ent), state.Action.AnimationKey);
-        _activeStates.Add(ent, state);
-    }
-
-    private void ExitState(EntityUid ent)
-    {
-        if (!_activeStates.TryGetValue(ent, out var state))
+        if (ent.Comp.ActiveState == state)
             return;
 
-        _activeStates.Remove(ent);
+        if (!TryComp<AnimationPlayerComponent>(ent, out var animComp))
+            return;
 
-        if (TryComp<AnimationPlayerComponent>(ent, out var animComp) &&
-            AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey))
-        {
-            var animEnt = (ent, animation: animComp);
-            AnimationSystem.Stop(animEnt, state.Action.AnimationKey);
-            if (!AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey + "_STOP"))
-                AnimationSystem.Play(ent, state.Action.StopAnimation(AppearanceSystem, ent), state.Action.AnimationKey + "_STOP");
-        }
+        if(AnimationSystem.HasRunningAnimation(animComp, ent.Comp.ActiveState.Action.AnimationKey))
+            AnimationSystem.Stop((ent, animComp), ent.Comp.ActiveState.Action.AnimationKey);
+
+        _sawmill.Debug($"Entering state for animation {state.Action.AnimationKey}");
+        if (!AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey))
+            AnimationSystem.Play(ent, state.Action.CreateAnimation(AppearanceSystem, ent), state.Action.AnimationKey);
+        ent.Comp.ActiveState = state;
     }
 
-    private void UpdateStateMachine(EntityUid ent)
+    private void UpdateStateMachine(Entity<AnimationStateMachineComponent> ent)
     {
-        if (_activeStates.TryGetValue(ent, out var currentState))
+        var currentState = ent.Comp.ActiveState;
+        var nextState = ent.Comp.DefaultState;
+
+        // Return if currentState has conditions that are still fulfilled.
+        if (currentState is { Conditions.Length: > 0 } && EvaluateConditions(ent, currentState))
+            return;
+
+        foreach (var state in ent.Comp.States)
         {
-            if (!EvaluateConditions(ent, currentState))
+            if (EvaluateConditions(ent, state))
             {
-                ExitState(ent);
+                nextState = state;
+                break;
             }
         }
-        else
-        {
-            var comp = Comp<AnimationStateMachineComponent>(ent);
-            foreach (var state in comp.States)
-            {
-                // TODO: ONLY FOR TESTING, REMOVE AND USE TRIGGERS/TIMERS INSTEAD!
-                if (!EvaluateConditions(ent, state))
-                    continue;
 
-                EnterState(ent, state);
-
-                return;
-            }
-        }
+        SwitchState(ent, nextState);
     }
 
-    private bool EvaluateConditions(EntityUid ent, AnimationState state)
+    private bool EvaluateConditions(Entity<AnimationStateMachineComponent> ent, AnimationState state)
     {
         foreach (var cond in state.Conditions)
         {
-            if (!cond.Evaluate(ent))
+            if (ent.Comp.NextUpdate > _timing.CurTime)
+                return cond.LastResult;
+            if (!cond.EvaluateInternal(ent))
             {
                 return false;
             }

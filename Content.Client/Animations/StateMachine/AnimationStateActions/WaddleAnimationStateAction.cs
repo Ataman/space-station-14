@@ -57,38 +57,6 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
         );
     }
 
-    public override Animation StopAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
-    {
-        var anim = new Animation()
-        {
-            Length = TimeSpan.FromSeconds(0),
-            AnimationTracks =
-            {
-                new AnimationTrackComponentProperty()
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Rotation),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(0), 0),
-                    },
-                },
-                new AnimationTrackComponentProperty()
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Offset),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(new Vector2(), 0),
-                    },
-                },
-            },
-        };
-        return anim;
-    }
-
     private Animation PlayWaddleAnimationUsing(float len, float tumbleIntensity)
     {
         _lastStep = !_lastStep;
