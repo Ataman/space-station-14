@@ -9,9 +9,9 @@ public sealed partial class StopAnimationStateAction : AnimationStateAction
 {
     public override string AnimationKey => "StopAnimation";
 
-    public override Animation CreateAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
+    protected override Animation? TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
-        var anim = new Animation()
+        return new Animation()
         {
             Length = TimeSpan.FromSeconds(0),
             AnimationTracks =
@@ -38,6 +38,5 @@ public sealed partial class StopAnimationStateAction : AnimationStateAction
                 },
             },
         };
-        return anim;
     }
 }

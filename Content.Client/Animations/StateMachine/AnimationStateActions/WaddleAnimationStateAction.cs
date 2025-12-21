@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
+using Content.Shared.Movement.Components;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
+using Robust.Shared.Configuration;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateActions;
 
@@ -37,9 +39,18 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
     /// </summary>
     private bool _lastStep;
 
+    private EntityManager _entities = null!;
+    private InputMoverComponent? _inputMoverComponent;
+
+    public override void Initialize(EntityManager entityManager)
+    {
+        _entities = entityManager;
+        RestartOnTrigger = true;
+    }
+
     private float CalculateAnimationLength()
     {
-        return AnimationLength;
+        return _inputMoverComponent!.Sprinting ? AnimationLength * RunAnimationLengthMultiplier : AnimationLength;
     }
 
     private float CalculateTumbleIntensity()
@@ -49,17 +60,23 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
 
     public override string AnimationKey => "WaddleAnimation";
 
-    public override Animation CreateAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
+    protected override Animation? TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
-        return PlayWaddleAnimationUsing(
-            CalculateAnimationLength(),
-            CalculateTumbleIntensity()
-        );
+        if (_inputMoverComponent == null)
+        {
+            if (!_entities.TryGetComponent<InputMoverComponent>(entity, out var physics))
+            {
+                return null;
+            }
+            _inputMoverComponent = physics;
+        }
+        if(restarting)
+            _lastStep = !_lastStep;
+        return PlayWaddleAnimationUsing(CalculateAnimationLength(), CalculateTumbleIntensity());
     }
 
     private Animation PlayWaddleAnimationUsing(float len, float tumbleIntensity)
     {
-        _lastStep = !_lastStep;
         var anim = new Animation()
         {
             Length = TimeSpan.FromSeconds(len),

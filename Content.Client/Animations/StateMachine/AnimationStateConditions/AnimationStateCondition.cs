@@ -1,6 +1,9 @@
+using JetBrains.Annotations;
+
 namespace Content.Client.Animations.StateMachine.AnimationStateConditions;
 
 [ImplicitDataDefinitionForInheritors]
+[PublicAPI]
 public abstract partial class AnimationStateCondition
 {
     internal bool LastResult = false;
@@ -17,5 +20,6 @@ public abstract partial class AnimationStateCondition
         return LastResult;
     }
 
+    [PublicAPI]
     protected abstract bool Evaluate(EntityUid ent);
 }

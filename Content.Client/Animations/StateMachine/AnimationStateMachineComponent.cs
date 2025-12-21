@@ -1,5 +1,6 @@
 using Content.Client.Animations.StateMachine.AnimationStateActions;
 using Content.Client.Animations.StateMachine.AnimationStateConditions;
+using Content.Client.Animations.StateMachine.AnimationStateTriggers;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine;
@@ -39,6 +40,12 @@ public sealed partial class AnimationState
     /// </summary>
     [DataField]
     public AnimationStateCondition[] Conditions = [];
+
+    /// <summary>
+    /// A collection of triggers that cause a conditions check.
+    /// </summary>
+    [DataField]
+    public AnimationStateTrigger[] Triggers = [];
 
     /// <summary>
     /// The action (animation) that should be used when this state is entered/running.

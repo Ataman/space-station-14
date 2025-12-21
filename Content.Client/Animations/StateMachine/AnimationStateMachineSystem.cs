@@ -30,13 +30,6 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         SubscribeLocalEvent<AnimationStateMachineComponent, ComponentInit>(OnAnimationStateMachineComponentInit);
         SubscribeLocalEvent<AnimationStateMachineComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<AnimationPlayerComponent, AnimationCompletedEvent>(OnAnimationCompleted);
-
-        SubscribeLocalEvent<InputMoverComponent, MoveInputEvent>(OnMoveInputEvent);
-    }
-
-    private void OnMoveInputEvent(Entity<InputMoverComponent> ent, ref MoveInputEvent args)
-    {
-        _sawmill.Debug($"Ent[{ent.Owner.Id}] - MoveInputEvent: HasDirectionalMovement={args.HasDirectionalMovement}, OldMovement={args.OldMovement}");
     }
 
     private void OnMapInit(EntityUid uid, AnimationStateMachineComponent comp, MapInitEvent init)
@@ -44,12 +37,10 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         comp.NextUpdate = _timing.CurTime + TimeSpan.FromSeconds(UpdateInterval);
     }
 
-    internal bool OnTrigger(AnimationState state, Entity<AnimationStateMachineComponent> entity)
+    internal void OnTrigger(AnimationState state, Entity<AnimationStateMachineComponent> entity)
     {
-        if (!EvaluateConditions(entity, state))
-            return false;
-        SwitchState(entity, state);
-        return true;
+        if (EvaluateConditions(entity, state, true))
+            SwitchState(entity, state, true);
     }
 
     private void OnAnimationCompleted(Entity<AnimationPlayerComponent> ent, ref AnimationCompletedEvent args)
@@ -61,8 +52,11 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         // Action without conditions is the default state, don't replay it.
         if (comp.ActiveState.Action.AnimationKey == args.Key &&
             comp.ActiveState != comp.DefaultState &&
-            EvaluateConditions((ent, comp), comp.ActiveState))
-            AnimationSystem.Play(ent, comp.ActiveState.Action.CreateAnimation(AppearanceSystem, ent), comp.ActiveState.Action.AnimationKey);
+            EvaluateConditions((ent, comp), comp.ActiveState, false) &&
+            comp.ActiveState.Action.TryAnimationInternal(AppearanceSystem, ent, out var animation, args.Finished))
+        {
+            AnimationSystem.Play(ent, animation, comp.ActiveState.Action.AnimationKey);
+        }
     }
 
     private void OnAnimationStateMachineComponentInit(Entity<AnimationStateMachineComponent> ent, ref ComponentInit args)
@@ -73,9 +67,16 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
             if (state.Conditions.Length == 0)
                 _sawmill.Error("Every AnimationState must have at least one condition.");
 
+            state.Action.Initialize(EntityManager);
+
             foreach (var cond in state.Conditions)
             {
                 cond.Initialize(EntityManager);
+            }
+
+            foreach (var trigger in state.Triggers)
+            {
+                trigger.InitializeInternal(EntityManager, ent, state);
             }
         }
     }
@@ -87,18 +88,20 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         var query = EntityQueryEnumerator<AnimationStateMachineComponent>();
         while (query.MoveNext(out var ent, out var comp))
         {
+            UpdateTriggers((ent, comp));
+
             if (comp.NextUpdate > _timing.CurTime)
                 continue;
 
-            UpdateStateMachine((ent, comp));
+            UpdateStateConditions((ent, comp));
 
             comp.NextUpdate += TimeSpan.FromSeconds(UpdateInterval);
         }
     }
 
-    private void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationState state)
+    private void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationState state, bool switchedByTrigger)
     {
-        if (ent.Comp.ActiveState == state)
+        if (ent.Comp.ActiveState == state && (!switchedByTrigger || !state.Action.RestartOnTrigger))
             return;
 
         if (!TryComp<AnimationPlayerComponent>(ent, out var animComp))
@@ -108,37 +111,49 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
             AnimationSystem.Stop((ent, animComp), ent.Comp.ActiveState.Action.AnimationKey);
 
         _sawmill.Debug($"Entering state for animation {state.Action.AnimationKey}");
-        if (!AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey))
-            AnimationSystem.Play(ent, state.Action.CreateAnimation(AppearanceSystem, ent), state.Action.AnimationKey);
-        ent.Comp.ActiveState = state;
+        if (!AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey) &&
+            state.Action.TryAnimationInternal(AppearanceSystem, ent, out var animation, false))
+            AnimationSystem.Play(ent, animation, state.Action.AnimationKey);
+        {
+            ent.Comp.ActiveState = state;
+        }
     }
 
-    private void UpdateStateMachine(Entity<AnimationStateMachineComponent> ent)
+    private void UpdateStateConditions(Entity<AnimationStateMachineComponent> ent)
     {
         var currentState = ent.Comp.ActiveState;
         var nextState = ent.Comp.DefaultState;
 
         // Return if currentState has conditions that are still fulfilled.
-        if (currentState is { Conditions.Length: > 0 } && EvaluateConditions(ent, currentState))
+        if (currentState is { Conditions.Length: > 0 } && EvaluateConditions(ent, currentState, false))
             return;
 
         foreach (var state in ent.Comp.States)
         {
-            if (EvaluateConditions(ent, state))
+            if (EvaluateConditions(ent, state, false))
             {
                 nextState = state;
                 break;
             }
         }
 
-        SwitchState(ent, nextState);
+        SwitchState(ent, nextState, false);
     }
 
-    private bool EvaluateConditions(Entity<AnimationStateMachineComponent> ent, AnimationState state)
+    private void UpdateTriggers(Entity<AnimationStateMachineComponent> ent)
+    {
+        foreach (var state in ent.Comp.States)
+        {
+            if(_timing.IsFirstTimePredicted)
+                EvaluateTriggers(ent, state);
+        }
+    }
+
+    private bool EvaluateConditions(Entity<AnimationStateMachineComponent> ent, AnimationState state, bool immediately)
     {
         foreach (var cond in state.Conditions)
         {
-            if (ent.Comp.NextUpdate > _timing.CurTime)
+            if (!_timing.IsFirstTimePredicted || !immediately && ent.Comp.NextUpdate > _timing.CurTime)
                 return cond.LastResult;
             if (!cond.EvaluateInternal(ent))
             {
@@ -147,5 +162,16 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         }
 
         return true;
+    }
+
+    private void EvaluateTriggers(Entity<AnimationStateMachineComponent> ent, AnimationState state)
+    {
+        foreach (var trigger in state.Triggers)
+        {
+            if (trigger.TriggerIfNecessaryInternal(ent))
+            {
+                return;
+            }
+        }
     }
 }
