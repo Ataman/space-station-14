@@ -13,13 +13,13 @@ public abstract partial class AnimationStateAction
     /// (Useful if an already running animation needs to change immediately after certain events).
     /// </summary>
     [DataField]
-    public bool RestartOnTrigger = false;
+    public bool RestartOnTrigger;
 
     /// <summary>
     /// If set to true, the state only executes its action one time instead of restarting it once the animation ends.
     /// </summary>
     [DataField]
-    public bool OneShot = false;
+    public bool OneShot;
 
     /// <summary>
     /// I couldn't get IoCManager.InjectDependencies to work, use this method to initialize them manually.

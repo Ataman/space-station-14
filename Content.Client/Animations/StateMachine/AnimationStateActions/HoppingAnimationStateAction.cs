@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
-using Content.Shared.Movement.Components;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
-using Robust.Shared.Configuration;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateActions;
 

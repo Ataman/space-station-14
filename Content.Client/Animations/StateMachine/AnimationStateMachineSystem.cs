@@ -1,16 +1,6 @@
-using Content.Client.Animations.StateMachine.AnimationStateActions;
-using Content.Shared.Movement.Components;
-using Content.Shared.Movement.Events;
-using Content.Shared.Movement.Systems;
-using Content.Shared.Trigger;
-using Content.Shared.Trigger.Components.Effects;
-using Content.Shared.Trigger.Components.Triggers;
 using Robust.Client.GameObjects;
 using Robust.Client.Timing;
-using Robust.Shared.GameStates;
-using Robust.Shared.Map.Components;
 using Robust.Shared.Random;
-using Robust.Shared.Timing;
 
 namespace Content.Client.Animations.StateMachine;
 
@@ -41,7 +31,6 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 
     private void OnAnimationCompleted(Entity<AnimationPlayerComponent> ent, ref AnimationCompletedEvent args)
     {
-        _sawmill.Debug("OnAnimationCompleted called");
         // TODO: Figure out how to only get here for our own animations.
         if (!TryComp<AnimationStateMachineComponent>(ent, out var comp))
             return;
@@ -123,7 +112,6 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         if(AnimationSystem.HasRunningAnimation(animComp, ent.Comp.ActiveState.Action.AnimationKey))
             AnimationSystem.Stop((ent, animComp), ent.Comp.ActiveState.Action.AnimationKey);
 
-        _sawmill.Debug($"Entering state for animation {state.Action.AnimationKey}");
         if (!AnimationSystem.HasRunningAnimation(animComp, state.Action.AnimationKey) &&
             state.Action.TryAnimationInternal(AppearanceSystem, ent, out var animation, false))
             AnimationSystem.Play(ent, animation, state.Action.AnimationKey);
