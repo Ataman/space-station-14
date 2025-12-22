@@ -28,13 +28,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         _sawmill = _logger.GetSawmill("asm");
 
         SubscribeLocalEvent<AnimationStateMachineComponent, ComponentInit>(OnAnimationStateMachineComponentInit);
-        SubscribeLocalEvent<AnimationStateMachineComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<AnimationPlayerComponent, AnimationCompletedEvent>(OnAnimationCompleted);
-    }
-
-    private void OnMapInit(EntityUid uid, AnimationStateMachineComponent comp, MapInitEvent init)
-    {
-        comp.NextUpdate = _timing.CurTime + TimeSpan.FromSeconds(UpdateInterval);
     }
 
     internal void OnTrigger(AnimationState state, Entity<AnimationStateMachineComponent> entity)
@@ -61,6 +55,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 
     private void OnAnimationStateMachineComponentInit(Entity<AnimationStateMachineComponent> ent, ref ComponentInit args)
     {
+        ent.Comp.NextUpdate = _timing.CurTime + TimeSpan.FromSeconds(UpdateInterval);
         foreach (var state in ent.Comp.States)
         {
             // TODO: Add more info to error message.

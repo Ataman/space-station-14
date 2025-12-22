@@ -59,7 +59,7 @@ public sealed partial class AnimationStateIsWalkingCondition : AnimationStateCon
         if (!_inputMoverComponent.HasDirectionalMovement || !_inputMoverComponent.CanMove)
             return false;
 
-        if (_physicsComponent.LinearVelocity == Vector2.Zero)
+        if (_physicsComponent.LinearVelocity.EqualsApprox(Vector2.Zero, 0.1f))
             return false;
 
         if (_gravitySystem.IsWeightless(entity))
