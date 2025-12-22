@@ -7,8 +7,6 @@ namespace Content.Client.Animations.StateMachine.AnimationStateActions;
 
 public sealed partial class StopAnimationStateAction : AnimationStateAction
 {
-    public override string AnimationKey => "StopAnimation";
-
     protected override Animation? TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
         return new Animation()

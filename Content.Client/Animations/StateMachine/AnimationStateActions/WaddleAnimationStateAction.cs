@@ -58,8 +58,6 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
         return _lastStep ? 360 - TumbleIntensity : TumbleIntensity;
     }
 
-    public override string AnimationKey => "WaddleAnimation";
-
     protected override Animation? TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
         if (_inputMoverComponent == null)

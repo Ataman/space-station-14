@@ -21,8 +21,6 @@ public sealed partial class HoppingAnimationStateAction : AnimationStateAction
     [DataField]
     public float AnimationLength = 0.3f;
 
-    public override string AnimationKey => "HoppingAnimation";
-
     protected override Animation TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
         var anim = new Animation()

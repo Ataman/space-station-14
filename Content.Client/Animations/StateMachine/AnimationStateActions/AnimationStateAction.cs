@@ -26,7 +26,8 @@ public abstract partial class AnimationStateAction
     /// </summary>
     /// <param name="entityManager"></param>
     public virtual void Initialize(EntityManager entityManager) { }
-    public abstract string AnimationKey { get; }
+
+    internal string AnimationKey => GetType().Name;
 
     internal bool TryAnimationInternal(AppearanceSystem appearanceSystem, EntityUid entity, [NotNullWhen(true)] out Animation? anim, bool restarting)
     {
