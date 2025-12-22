@@ -9,6 +9,7 @@ using Robust.Client.GameObjects;
 using Robust.Client.Timing;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Client.Animations.StateMachine;
@@ -17,6 +18,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 {
     [Dependency] private readonly ILogManager _logger = default!;
     [Dependency] private readonly IClientGameTiming _timing = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     private ISawmill _sawmill = default!;
 
     private const float UpdateInterval = 0.1f;
@@ -39,15 +41,21 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 
     private void OnAnimationCompleted(Entity<AnimationPlayerComponent> ent, ref AnimationCompletedEvent args)
     {
+        _sawmill.Debug("OnAnimationCompleted called");
         // TODO: Figure out how to only get here for our own animations.
         if (!TryComp<AnimationStateMachineComponent>(ent, out var comp))
             return;
 
-        // Action without conditions is the default state, don't replay it.
-        if (comp.ActiveState.Action.AnimationKey == args.Key &&
-            comp.ActiveState != comp.DefaultState &&
-            EvaluateConditions((ent, comp), comp.ActiveState, false) &&
-            comp.ActiveState.Action.TryAnimationInternal(AppearanceSystem, ent, out var animation, args.Finished))
+        if (comp.ActiveState.Action.AnimationKey != args.Key)
+            return;
+
+        if (comp.ActiveState.Action.OneShot)
+        {
+            SwitchState((ent, comp), comp.DefaultState, false);
+        }
+        else if (comp.ActiveState != comp.DefaultState &&
+                 EvaluateConditions((ent, comp), comp.ActiveState, false) &&
+                 comp.ActiveState.Action.TryAnimationInternal(AppearanceSystem, ent, out var animation, args.Finished))
         {
             AnimationSystem.Play(ent, animation, comp.ActiveState.Action.AnimationKey);
         }
@@ -90,7 +98,14 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 
             UpdateStateConditions((ent, comp));
 
-            comp.NextUpdate += TimeSpan.FromSeconds(UpdateInterval);
+            if (comp.Timer != null)
+            {
+                comp.NextUpdate += comp.Timer.GetNextPeriod(_random);
+            }
+            else
+            {
+                comp.NextUpdate += TimeSpan.FromSeconds(UpdateInterval);
+            }
         }
     }
 
@@ -100,7 +115,10 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
             return;
 
         if (!TryComp<AnimationPlayerComponent>(ent, out var animComp))
+        {
+            _sawmill.Error($"Entity {ent.Owner.Id} is running an AnimationStateMachine without the AnimationPlayerComponent.");
             return;
+        }
 
         if(AnimationSystem.HasRunningAnimation(animComp, ent.Comp.ActiveState.Action.AnimationKey))
             AnimationSystem.Stop((ent, animComp), ent.Comp.ActiveState.Action.AnimationKey);
@@ -120,7 +138,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         var nextState = ent.Comp.DefaultState;
 
         // Return if currentState has conditions that are still fulfilled.
-        if (currentState is { Conditions.Length: > 0 } && EvaluateConditions(ent, currentState, false))
+        if (currentState is { Conditions.Length: > 0, Action.OneShot: false } && EvaluateConditions(ent, currentState, false))
             return;
 
         foreach (var state in ent.Comp.States)

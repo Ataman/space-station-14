@@ -16,6 +16,12 @@ public abstract partial class AnimationStateAction
     public bool RestartOnTrigger = false;
 
     /// <summary>
+    /// If set to true, the state only executes its action one time instead of restarting it once the animation ends.
+    /// </summary>
+    [DataField]
+    public bool OneShot = false;
+
+    /// <summary>
     /// I couldn't get IoCManager.InjectDependencies to work, use this method to initialize them manually.
     /// </summary>
     /// <param name="entityManager"></param>

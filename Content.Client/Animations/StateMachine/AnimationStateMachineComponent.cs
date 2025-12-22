@@ -1,5 +1,6 @@
 using Content.Client.Animations.StateMachine.AnimationStateActions;
 using Content.Client.Animations.StateMachine.AnimationStateConditions;
+using Content.Client.Animations.StateMachine.AnimationStateTimers;
 using Content.Client.Animations.StateMachine.AnimationStateTriggers;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
@@ -20,6 +21,13 @@ public sealed partial class AnimationStateMachineComponent : Component
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan NextUpdate = TimeSpan.Zero;
+
+    /// <summary>
+    /// Optional timer for executing an update.
+    /// Setting this disables periodic condition checks.
+    /// </summary>
+    [DataField]
+    public AnimationStateTimer? Timer;
 
     [DataField]
     public AnimationState DefaultState = AnimationState.StopAnimationState;
