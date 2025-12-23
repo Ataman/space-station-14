@@ -1,8 +1,8 @@
 ﻿using Robust.Shared.Random;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateTimers;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineTimers;
 
-public sealed partial class AnimationStateRandomTimeRangeTimer : AnimationStateTimer
+public sealed partial class AnimationStateMachineRandomTimeRangeTimer : AnimationStateMachineTimer
 {
     [DataField]
     public TimeSpan MinTime;

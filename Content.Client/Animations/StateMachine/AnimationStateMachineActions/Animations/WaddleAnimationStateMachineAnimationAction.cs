@@ -4,9 +4,9 @@ using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateActions;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions.Animations;
 
-public sealed partial class WaddleAnimationStateAction : AnimationStateAction
+public sealed partial class WaddleAnimationStateMachineAnimationAction : AnimationStateMachineAnimationAction
 {
     ///<summary>
     /// How high should they hop during the waddle? Higher hop = more energy.
@@ -57,7 +57,7 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
         return _lastStep ? 360 - TumbleIntensity : TumbleIntensity;
     }
 
-    protected override Animation? TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
+    protected override Animation? GetNextAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
         if (_inputMoverComponent == null)
         {
@@ -106,5 +106,10 @@ public sealed partial class WaddleAnimationStateAction : AnimationStateAction
             },
         };
         return anim;
+    }
+
+    protected override Animation? GetResetAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
+    {
+        return StopAnimation;
     }
 }

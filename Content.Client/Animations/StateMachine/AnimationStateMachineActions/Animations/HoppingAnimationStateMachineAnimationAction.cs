@@ -3,9 +3,9 @@ using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateActions;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions.Animations;
 
-public sealed partial class HoppingAnimationStateAction : AnimationStateAction
+public sealed partial class HoppingAnimationStateMachineAnimationAction : AnimationStateMachineAnimationAction
 {
     ///<summary>
     /// How high should they hop? Higher hop = more energy.
@@ -19,7 +19,7 @@ public sealed partial class HoppingAnimationStateAction : AnimationStateAction
     [DataField]
     public float AnimationLength = 0.3f;
 
-    protected override Animation TryAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
+    protected override Animation GetNextAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {
         var anim = new Animation()
         {
@@ -41,5 +41,10 @@ public sealed partial class HoppingAnimationStateAction : AnimationStateAction
             },
         };
         return anim;
+    }
+
+    protected override Animation? GetResetAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
+    {
+        return StopAnimation;
     }
 }

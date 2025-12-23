@@ -1,17 +1,18 @@
+using Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 using JetBrains.Annotations;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateTriggers;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
 
 [ImplicitDataDefinitionForInheritors]
 [PublicAPI]
-public abstract partial class AnimationStateTrigger
+public abstract partial class AnimationStateMachineTrigger
 {
     private AnimationStateMachineSystem _animationStateMachineSystem;
     private Entity<AnimationStateMachineComponent> _entity;
-    private AnimationState _parentState;
+    private AnimationStateMachineState _parentState;
     private bool _triggered = false;
 
-    internal void InitializeInternal(EntityManager entityManager, Entity<AnimationStateMachineComponent> entity, AnimationState state)
+    internal void InitializeInternal(EntityManager entityManager, Entity<AnimationStateMachineComponent> entity, AnimationStateMachineState state)
     {
         _animationStateMachineSystem = entityManager.System<AnimationStateMachineSystem>();
         _entity = entity;

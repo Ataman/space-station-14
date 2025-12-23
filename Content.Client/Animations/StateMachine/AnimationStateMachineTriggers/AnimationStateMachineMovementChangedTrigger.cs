@@ -1,8 +1,8 @@
 ﻿using Content.Shared.Movement.Components;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateTriggers;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
 
-public sealed partial class AnimationStateMovementChangedTrigger : AnimationStateTrigger
+public sealed partial class AnimationStateMachineMovementChangedTrigger : AnimationStateMachineTrigger
 {
     private EntityManager _entities = null!;
     private InputMoverComponent? _inputMoverComponent;

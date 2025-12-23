@@ -1,7 +1,5 @@
-using Content.Client.Animations.StateMachine.AnimationStateActions;
-using Content.Client.Animations.StateMachine.AnimationStateConditions;
-using Content.Client.Animations.StateMachine.AnimationStateTimers;
-using Content.Client.Animations.StateMachine.AnimationStateTriggers;
+using Content.Client.Animations.StateMachine.AnimationStateMachineStates;
+using Content.Client.Animations.StateMachine.AnimationStateMachineTimers;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine;
@@ -9,17 +7,18 @@ namespace Content.Client.Animations.StateMachine;
 [RegisterComponent, AutoGenerateComponentPause]
 public sealed partial class AnimationStateMachineComponent : Component
 {
+    private static readonly AnimationStateMachineState NullState = new NullAnimationStateMachineState();
     /// <summary>
     /// A collection of possible states for this component.
     /// </summary>
     [DataField]
-    public List<AnimationState> States = [];
+    public List<AnimationStateMachineState> States = [];
 
     /// <summary>
-    /// The server time at which the next sound will play.
+    /// Time for the next update.
     /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoPausedField]
     public TimeSpan NextUpdate = TimeSpan.Zero;
 
     /// <summary>
@@ -27,39 +26,17 @@ public sealed partial class AnimationStateMachineComponent : Component
     /// Setting this disables periodic condition checks.
     /// </summary>
     [DataField]
-    public AnimationStateTimer? Timer;
+    public AnimationStateMachineTimer? Timer;
 
+    /// <summary>
+    /// The default state to enter when no other state matches their conditions.
+    /// </summary>
     [DataField]
-    public AnimationState DefaultState = AnimationState.StopAnimationState;
+    public AnimationStateMachineState DefaultState = NullState;
 
+    /// <summary>
+    /// The currently active state.
+    /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
-    public AnimationState ActiveState = AnimationState.StopAnimationState;
-
-    [ViewVariables(VVAccess.ReadOnly)]
-    public bool IsWalking = false;
-}
-
-[Serializable]
-[DataDefinition]
-public sealed partial class AnimationState
-{
-    /// <summary>
-    /// A collection of conditions that must be true for this state to activate.
-    /// </summary>
-    [DataField]
-    public AnimationStateCondition[] Conditions = [];
-
-    /// <summary>
-    /// A collection of triggers that cause a conditions check.
-    /// </summary>
-    [DataField]
-    public AnimationStateTrigger[] Triggers = [];
-
-    /// <summary>
-    /// The action (animation) that should be used when this state is entered/running.
-    /// </summary>
-    [DataField]
-    public AnimationStateAction Action;
-
-    public static AnimationState StopAnimationState = new AnimationState() { Action = new StopAnimationStateAction() };
+    public AnimationStateMachineState ActiveState = NullState;
 }

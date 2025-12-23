@@ -1,10 +1,10 @@
 using JetBrains.Annotations;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateConditions;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
 [ImplicitDataDefinitionForInheritors]
 [PublicAPI]
-public abstract partial class AnimationStateCondition
+public abstract partial class AnimationStateMachineCondition
 {
     internal bool LastResult = false;
 

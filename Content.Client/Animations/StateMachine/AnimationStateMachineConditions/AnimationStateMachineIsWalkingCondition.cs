@@ -7,9 +7,9 @@ using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Robust.Shared.Physics.Components;
 
-namespace Content.Client.Animations.StateMachine.AnimationStateConditions;
+namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 
-public sealed partial class AnimationStateIsWalkingCondition : AnimationStateCondition
+public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationStateMachineCondition
 {
     private EntityManager _entities = null!;
     private GravitySystem _gravitySystem = null!;
