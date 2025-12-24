@@ -20,14 +20,13 @@ public sealed partial class EyeBlinkAnimationStateMachineSpriteChangeAction : An
         if (!manager.TryGetComponent<HumanoidAppearanceComponent>(entity.Owner, out var humanoid))
             return;
         _humanoid = humanoid;
-        _originalColor = humanoid.EyeColor;
     }
 
     public override void ExecuteSpriteChange(Entity<SpriteComponent> entity)
     {
         if (_humanoid == null)
             return;
-
+        _originalColor = _humanoid.EyeColor;
         var blinkFade = BlinkSkinColorMultiplier;
         var blinkColor = new Color(
             _humanoid.SkinColor.R * blinkFade,

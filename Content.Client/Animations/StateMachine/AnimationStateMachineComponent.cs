@@ -7,7 +7,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine;
 
-[RegisterComponent, AutoGenerateComponentPause]
+[RegisterComponent]
 public sealed partial class AnimationStateMachineComponent : Component
 {
     [DataField]
@@ -35,6 +35,7 @@ internal sealed class AnimationStateMachineInstance
     internal AnimationStateMachineState[] States = [];
     internal AnimationStateMachineTimer? Timer = null;
     internal AnimationStateMachineState ActiveState = new NullAnimationStateMachineState();
+    internal TimeSpan ActiveStateExitTime = TimeSpan.Zero;
 
     internal void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineState newState, bool switchedByTrigger)
     {

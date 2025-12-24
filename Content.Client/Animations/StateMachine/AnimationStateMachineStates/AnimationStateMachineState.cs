@@ -1,12 +1,11 @@
 ﻿using Content.Client.Animations.StateMachine.AnimationStateMachineActions;
 using Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 using Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
-[Serializable]
-[DataDefinition]
-[ImplicitDataDefinitionForInheritors]
+[Serializable, ImplicitDataDefinitionForInheritors]
 public abstract partial class AnimationStateMachineState
 {
     /// <summary>
@@ -26,6 +25,12 @@ public abstract partial class AnimationStateMachineState
     /// </summary>
     [DataField]
     public bool OneShot;
+
+    /// <summary>
+    /// If set to non-zero, state exits automatically after the defined timespan.
+    /// </summary>
+    [DataField]
+    public TimeSpan ExitPeriod = TimeSpan.Zero;
 
     /// <summary>
     /// Called once after creation of the state machine.

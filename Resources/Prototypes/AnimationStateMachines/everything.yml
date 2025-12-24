@@ -18,7 +18,7 @@
     minTime: 1
     maxTime: 3
 
-- type: animationStateMachine # TODO: Implement an exit timer for animation, otherwise our eyes stay shut, duh.
+- type: animationStateMachine
   id: EyeAnimationStateMachine
   states:
   - !type:AnimationStateMachineSpriteChangeState
@@ -26,6 +26,7 @@
     - !type:AnimationStateMachineHasMobStateCondition
       state: Alive
     action: !type:EyeBlinkAnimationStateMachineSpriteChangeAction
+    exitPeriod: 0.1
   timer: !type:AnimationStateMachineRandomTimeRangeTimer
     minTime: 1
     maxTime: 3

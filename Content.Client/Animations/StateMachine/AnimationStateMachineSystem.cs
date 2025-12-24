@@ -123,6 +123,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
     private void UpdateStateMachine(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineInstance stateMachine)
     {
         UpdateTriggers(ent, stateMachine);
+        ExitActiveStateIfExitTimerReached(ent, stateMachine);
 
         if (ent.Comp.NextUpdates[stateMachine.Prototype] > _timing.CurTime)
             return;
@@ -137,6 +138,19 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         {
             ent.Comp.NextUpdates[stateMachine.Prototype] += TimeSpan.FromSeconds(UpdateInterval);
         }
+    }
+
+    private void ExitActiveStateIfExitTimerReached(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineInstance stateMachine)
+    {
+        if (!_timing.IsFirstTimePredicted)
+            return;
+        if (stateMachine.ActiveStateExitTime == TimeSpan.Zero)
+            return;
+        if (stateMachine.ActiveStateExitTime > _timing.CurTime)
+            return;
+
+        stateMachine.SwitchState(ent, _prototypeManager.Index(stateMachine.Prototype).DefaultState, false);
+        stateMachine.ActiveStateExitTime = TimeSpan.Zero;
     }
 
     public override void Update(float frameTime)
@@ -159,7 +173,9 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         var nextState = _prototypeManager.Index(stateMachine.Prototype).DefaultState;
 
         // Return if currentState has conditions that are still fulfilled.
-        if (currentState is { Conditions.Length: > 0, OneShot: false } && EvaluateConditions(ent, currentState, ent.Comp.NextUpdates[stateMachine.Prototype]))
+        if (currentState is { Conditions.Length: > 0, OneShot: false } &&
+            EvaluateConditions(ent, currentState, ent.Comp.NextUpdates[stateMachine.Prototype]) &&
+            stateMachine.ActiveStateExitTime == TimeSpan.Zero)
             return;
 
         foreach (var state in stateMachine.States)
@@ -172,6 +188,8 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         }
 
         stateMachine.SwitchState(ent, nextState, false);
+        if (nextState.ExitPeriod != TimeSpan.Zero)
+            stateMachine.ActiveStateExitTime = _timing.CurTime + nextState.ExitPeriod;
     }
 
     private void UpdateTriggers(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineInstance stateMachine)
