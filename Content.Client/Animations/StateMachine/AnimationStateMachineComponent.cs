@@ -1,5 +1,8 @@
+using Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 using Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 using Content.Client.Animations.StateMachine.AnimationStateMachineTimers;
+using Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine;
@@ -7,36 +10,39 @@ namespace Content.Client.Animations.StateMachine;
 [RegisterComponent, AutoGenerateComponentPause]
 public sealed partial class AnimationStateMachineComponent : Component
 {
-    private static readonly AnimationStateMachineState NullState = new NullAnimationStateMachineState();
-    /// <summary>
-    /// A collection of possible states for this component.
-    /// </summary>
     [DataField]
-    public List<AnimationStateMachineState> States = [];
+    public List<ProtoId<AnimationStateMachinePrototype>> StateMachines;
 
     /// <summary>
-    /// Time for the next update.
+    /// Tracks the next update time for each state machine.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoPausedField]
-    public TimeSpan NextUpdate = TimeSpan.Zero;
+    /// <remarks>
+    /// TODO: Add AutoPausedField when https://github.com/space-wizards/RobustToolbox/issues/3768 is fixed.
+    /// </remarks>
+    public Dictionary<ProtoId<AnimationStateMachinePrototype>, TimeSpan> NextUpdates = new();
 
-    /// <summary>
-    /// Optional timer for executing an update.
-    /// Setting this disables periodic condition checks.
-    /// </summary>
-    [DataField]
-    public AnimationStateMachineTimer? Timer;
+    internal List<AnimationStateMachineInstance> ActiveStateMachines = [];
+}
 
-    /// <summary>
-    /// The default state to enter when no other state matches their conditions.
-    /// </summary>
-    [DataField]
-    public AnimationStateMachineState DefaultState = NullState;
+/// <summary>
+/// Prototypes of AnimationStateMachine are (presumably) singletons.
+/// Conditions and other types require per-instance data.
+/// Thus, a holding struct is required to keep track.
+/// </summary>
+internal sealed class AnimationStateMachineInstance
+{
+    internal ProtoId<AnimationStateMachinePrototype> Prototype = default;
+    internal AnimationStateMachineState[] States = [];
+    internal AnimationStateMachineTimer? Timer = null;
+    internal AnimationStateMachineState ActiveState = new NullAnimationStateMachineState();
 
-    /// <summary>
-    /// The currently active state.
-    /// </summary>
-    [ViewVariables(VVAccess.ReadOnly)]
-    public AnimationStateMachineState ActiveState = NullState;
+    internal void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineState newState, bool switchedByTrigger)
+    {
+        if (ActiveState == newState)
+            return;
+
+        ActiveState.Exit(ent.Owner);
+        newState.Enter(ent.Owner, switchedByTrigger);
+        ActiveState = newState;
+    }
 }

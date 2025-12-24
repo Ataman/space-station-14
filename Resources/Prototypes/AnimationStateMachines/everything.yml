@@ -1,0 +1,31 @@
+﻿- type: animationStateMachine
+  id: WaddleAnimationStateMachine
+  states:
+  - !type:AnimationStateMachineAnimationState
+    conditions:
+    - !type:AnimationStateMachineIsWalkingCondition
+    action: !type:WaddleAnimationStateMachineAnimationAction
+
+- type: animationStateMachine
+  id: HoppingAnimationStateMachine
+  states:
+  - !type:AnimationStateMachineAnimationState
+    conditions:
+    - !type:AnimationStateMachineIsWalkingCondition
+    action: !type:HoppingAnimationStateMachineAnimationAction
+    oneShot: true
+  timer: !type:AnimationStateMachineRandomTimeRangeTimer
+    minTime: 1
+    maxTime: 3
+
+- type: animationStateMachine # TODO: Implement an exit timer for animation, otherwise our eyes stay shut, duh.
+  id: EyeAnimationStateMachine
+  states:
+  - !type:AnimationStateMachineSpriteChangeState
+    conditions:
+    - !type:AnimationStateMachineHasMobStateCondition
+      state: Alive
+    action: !type:EyeBlinkAnimationStateMachineSpriteChangeAction
+  timer: !type:AnimationStateMachineRandomTimeRangeTimer
+    minTime: 1
+    maxTime: 3

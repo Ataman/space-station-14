@@ -13,8 +13,8 @@ public sealed partial class AnimationStateMachineAnimationState : AnimationState
     [DataField]
     public AnimationStateMachineAnimationAction Action = NullAction;
 
-    private string RunningAnimationKey => Action.GetType().Name + "_RUNNING";
-    private string StopAnimationKey => Action.GetType().Name + "_STOP";
+    internal string RunningAnimationKey => Action.GetType().Name + "_RUNNING";
+    internal string StopAnimationKey => Action.GetType().Name + "_STOP";
 
     /// <summary>
     /// I couldn't get IoCManager.InjectDependencies to work, use this method to initialize them manually.
