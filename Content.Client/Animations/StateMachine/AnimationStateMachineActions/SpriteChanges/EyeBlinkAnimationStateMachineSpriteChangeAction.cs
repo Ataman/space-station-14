@@ -9,13 +9,10 @@ public sealed partial class EyeBlinkAnimationStateMachineSpriteChangeAction : An
     public float BlinkSkinColorMultiplier = 0.9f;
 
     private HumanoidAppearanceComponent? _humanoid;
-    private Color _originalColor = Color.White;
-    private EntityManager _entities;
     private SpriteSystem _spriteSystem;
 
     public override void Initialize(Entity<SpriteComponent> entity, EntityManager manager)
     {
-        _entities = manager;
         _spriteSystem = manager.System<SpriteSystem>();
         if (!manager.TryGetComponent<HumanoidAppearanceComponent>(entity.Owner, out var humanoid))
             return;
@@ -26,7 +23,6 @@ public sealed partial class EyeBlinkAnimationStateMachineSpriteChangeAction : An
     {
         if (_humanoid == null)
             return;
-        _originalColor = _humanoid.EyeColor;
         var blinkFade = BlinkSkinColorMultiplier;
         var blinkColor = new Color(
             _humanoid.SkinColor.R * blinkFade,
@@ -40,6 +36,6 @@ public sealed partial class EyeBlinkAnimationStateMachineSpriteChangeAction : An
         if (_humanoid == null)
             return;
 
-        entity.Comp[_spriteSystem.LayerMapReserve((entity.Owner, entity.Comp), HumanoidVisualLayers.Eyes)].Color = _originalColor;
+        entity.Comp[_spriteSystem.LayerMapReserve((entity.Owner, entity.Comp), HumanoidVisualLayers.Eyes)].Color = _humanoid.EyeColor;
     }
 }

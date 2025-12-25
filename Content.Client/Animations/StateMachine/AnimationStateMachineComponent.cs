@@ -25,9 +25,8 @@ public sealed partial class AnimationStateMachineComponent : Component
 }
 
 /// <summary>
-/// Prototypes of AnimationStateMachine are (presumably) singletons.
-/// Conditions and other types require per-instance data.
-/// Thus, a holding struct is required to keep track.
+/// Prototypes are global instances but conditions and other objects require per-instance data.
+/// This holding object keeps track on an entity basis.
 /// </summary>
 internal sealed class AnimationStateMachineInstance
 {

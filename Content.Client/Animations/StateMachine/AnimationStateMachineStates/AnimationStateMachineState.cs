@@ -1,7 +1,5 @@
-﻿using Content.Client.Animations.StateMachine.AnimationStateMachineActions;
-using Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
+﻿using Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 using Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 

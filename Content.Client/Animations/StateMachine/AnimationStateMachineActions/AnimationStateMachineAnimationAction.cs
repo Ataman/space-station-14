@@ -7,7 +7,6 @@ using Robust.Shared.Animations;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions;
 [ImplicitDataDefinitionForInheritors]
-[PublicAPI]
 public abstract partial class AnimationStateMachineAnimationAction
 {
     ///<summary>
@@ -16,8 +15,6 @@ public abstract partial class AnimationStateMachineAnimationAction
     /// </summary>
     [DataField]
     public bool RestartOnTrigger;
-
-    protected string AnimationKey => GetType().Name;
 
     public virtual void Initialize(EntityManager entityManager) { }
 
@@ -33,7 +30,6 @@ public abstract partial class AnimationStateMachineAnimationAction
         return anim != null;
     }
 
-    [PublicAPI]
     protected abstract Animation? GetNextAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting);
 
     protected abstract Animation? GetResetAnimation(AppearanceSystem appearanceSystem, EntityUid entity);
