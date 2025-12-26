@@ -12,11 +12,12 @@
   - !type:AnimationStateMachineAnimationState
     conditions:
     - !type:AnimationStateMachineIsWalkingCondition
+      ignoreMovementInput: true
     action: !type:HoppingAnimationStateMachineAnimationAction
     oneShot: true
   timer: !type:AnimationStateMachineRandomTimeRangeTimer
-    minTime: 1
-    maxTime: 3
+    minTime: 0.5
+    maxTime: 2
 
 - type: animationStateMachine
   id: EyeAnimationStateMachine
@@ -28,5 +29,5 @@
     action: !type:EyeBlinkAnimationStateMachineSpriteChangeAction
     exitPeriod: 0.1
   timer: !type:AnimationStateMachineRandomTimeRangeTimer
-    minTime: 1
-    maxTime: 3
+    minTime: 0.5
+    maxTime: 5

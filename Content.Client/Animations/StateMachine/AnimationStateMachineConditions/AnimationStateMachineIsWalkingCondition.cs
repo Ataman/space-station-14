@@ -21,6 +21,12 @@ public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationS
     private InputMoverComponent? _inputMoverComponent;
     private PhysicsComponent? _physicsComponent;
 
+    /// <summary>
+    /// Set to true to ignore the input state of the mob. Necessary for certain mobs like mice.
+    /// </summary>
+    [DataField]
+    public bool IgnoreMovementInput = false;
+
     public override void Initialize(EntityManager entityManager)
     {
         base.Initialize(entityManager);
@@ -52,12 +58,15 @@ public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationS
             _physicsComponent = input;
         }
 
-        var velocity = _sharedMoverController.GetVelocityInput(_inputMoverComponent);
-        if (velocity.Walking == Vector2.Zero && velocity.Sprinting == Vector2.Zero)
-            return false;
+        if (!IgnoreMovementInput)
+        {
+            var velocity = _sharedMoverController.GetVelocityInput(_inputMoverComponent);
+            if (velocity.Walking == Vector2.Zero && velocity.Sprinting == Vector2.Zero)
+                return false;
 
-        if (!_inputMoverComponent.HasDirectionalMovement || !_inputMoverComponent.CanMove)
-            return false;
+            if (!_inputMoverComponent.HasDirectionalMovement || !_inputMoverComponent.CanMove)
+                return false;
+        }
 
         if (_physicsComponent.LinearVelocity.EqualsApprox(Vector2.Zero, 0.1f))
             return false;
