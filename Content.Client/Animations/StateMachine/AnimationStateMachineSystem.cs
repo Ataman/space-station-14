@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Reflection;
 using Content.Client.Animations.StateMachine.AnimationStateMachineConditions;
 using Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 using Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
@@ -21,6 +23,8 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
 
     private const float UpdateInterval = 0.1f;
 
+    private Dictionary<EntityUid, List<(Type, string)>> _actingComponentProperties = new();
+
     public override void Initialize()
     {
         base.Initialize();
@@ -40,6 +44,27 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
                 stateMachine.SwitchState(entity, state, true);
             }
         }
+    }
+
+    internal void RegisterEntityAnimationProperty(EntityUid uid, Type type, string prop)
+    {
+        if (!_actingComponentProperties.ContainsKey(uid))
+            _actingComponentProperties.Add(uid, []);
+        if (_actingComponentProperties[uid]
+            .Any(x => x.Item1 == type && x.Item2 == prop))
+        {
+            _sawmill.Error($"An animation using the {prop} property on {type.Name} has already been registered for entity {uid}");
+            return;
+        }
+        _actingComponentProperties[uid].Add((type, prop));
+    }
+
+    internal void DeregisterEntityAnimationProperty(EntityUid uid, Type type, string prop)
+    {
+        if(!_actingComponentProperties.ContainsKey(uid))
+            _actingComponentProperties.Add(uid, []);
+        var tuple = _actingComponentProperties[uid].Single(x => x.Item1 == type && x.Item2 == prop);
+        _actingComponentProperties[uid].Remove(tuple);
     }
 
     private void OnAnimationCompleted(Entity<AnimationPlayerComponent> ent, ref AnimationCompletedEvent args)
