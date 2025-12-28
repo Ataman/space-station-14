@@ -1,10 +1,14 @@
 ﻿- type: animationStateMachine
-  id: WaddleAnimationStateMachine
+  id: AbsoluteClown
   states:
   - !type:AnimationStateMachineAnimationState
     conditions:
     - !type:AnimationStateMachineIsWalkingCondition
     action: !type:WaddleAnimationStateMachineAnimationAction
+  - !type:AnimationStateMachineAnimationState
+    conditions:
+    - !type:AnimationStateMachineIsWeightlessCondition
+    action: !type:RollingAnimationStateMachineAnimationAction
 
 - type: animationStateMachine
   id: RollingAnimationStateMachine
