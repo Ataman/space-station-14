@@ -11,6 +11,13 @@ namespace Content.Client.Animations.StateMachine.AnimationStateMachineConditions
 
 public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationStateMachineCondition
 {
+    private enum MovementType
+    {
+        Walking,
+        Sprinting,
+        Both,
+    }
+
     private EntityManager _entities = null!;
     private GravitySystem _gravitySystem = null!;
     private ActionBlockerSystem _actionBlockerSystem = null!;
@@ -26,6 +33,12 @@ public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationS
     /// </summary>
     [DataField]
     public bool IgnoreMovementInput = false;
+
+    /// <summary>
+    /// MovementType required movement type.
+    /// </summary>
+    [DataField]
+    private MovementType MovType = MovementType.Both;
 
     public override void Initialize(EntityManager entityManager)
     {
@@ -60,11 +73,16 @@ public sealed partial class AnimationStateMachineIsWalkingCondition : AnimationS
 
         if (!IgnoreMovementInput)
         {
-            var velocity = _sharedMoverController.GetVelocityInput(_inputMoverComponent);
-            if (velocity.Walking == Vector2.Zero && velocity.Sprinting == Vector2.Zero)
+            if (!_inputMoverComponent.HasDirectionalMovement || !_inputMoverComponent.CanMove)
                 return false;
 
-            if (!_inputMoverComponent.HasDirectionalMovement || !_inputMoverComponent.CanMove)
+            var velocity = _sharedMoverController.GetVelocityInput(_inputMoverComponent);
+
+            if (MovType == MovementType.Both && velocity.Walking == Vector2.Zero && velocity.Sprinting == Vector2.Zero)
+                return false;
+            if (MovType == MovementType.Walking && velocity.Walking == Vector2.Zero)
+                return false;
+            if (MovType == MovementType.Sprinting && velocity.Sprinting == Vector2.Zero)
                 return false;
         }
 
