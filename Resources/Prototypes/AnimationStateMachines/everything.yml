@@ -7,6 +7,15 @@
     action: !type:WaddleAnimationStateMachineAnimationAction
 
 - type: animationStateMachine
+  id: RollingAnimationStateMachine
+  states:
+  - !type:AnimationStateMachineAnimationState
+    conditions:
+    - !type:AnimationStateMachineIsWalkingCondition
+      ignoreMovementInput: true
+    action: !type:RollingAnimationStateMachineAnimationAction
+
+- type: animationStateMachine
   id: HoppingAnimationStateMachine
   states:
   - !type:AnimationStateMachineAnimationState
