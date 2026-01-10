@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Content.Shared.Movement.Components;
+using Content.Shared.Rotation;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Shared.Animations;
@@ -67,6 +68,11 @@ public sealed partial class WaddleAnimationStateMachineAnimationAction : Animati
             }
             _inputMoverComponent = physics;
         }
+
+        appearanceSystem.TryGetData<RotationState>(entity, RotationVisuals.RotationState, out var rotationState);
+        if (rotationState == RotationState.Horizontal)
+            return null;
+
         if(restarting)
             _lastStep = !_lastStep;
         return PlayWaddleAnimationUsing(CalculateAnimationLength(), CalculateTumbleIntensity());
@@ -110,6 +116,9 @@ public sealed partial class WaddleAnimationStateMachineAnimationAction : Animati
 
     protected override Animation? GetResetAnimation(AppearanceSystem appearanceSystem, EntityUid entity)
     {
+        appearanceSystem.TryGetData<RotationState>(entity, RotationVisuals.RotationState, out var rotationState);
+        if (rotationState == RotationState.Horizontal)
+            return null;
         return StopAnimation;
     }
 }
