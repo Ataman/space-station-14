@@ -1,46 +1,47 @@
 ﻿- type: animationStateMachine
   id: AbsoluteClown
   states:
-  - !type:AnimationStateMachineAnimationState
+  - !Animation
     conditions:
-    - !type:AnimationStateMachineIsWalkingCondition
-    action: !type:WaddleAnimationStateMachineAnimationAction
-  - !type:AnimationStateMachineAnimationState
+    - !IsWalking
+    action: !Waddle
+  - !Animation
     conditions:
-    - !type:AnimationStateMachineIsWeightlessCondition
-    action: !type:RollingAnimationStateMachineAnimationAction
+    - !IsWeightless
+    action: !Rolling
 
 - type: animationStateMachine
   id: RollingAnimationStateMachine
   states:
-  - !type:AnimationStateMachineAnimationState
+  - !Animation
     conditions:
-    - !type:AnimationStateMachineIsWalkingCondition
+    - !IsWalking
       ignoreMovementInput: true
-    action: !type:RollingAnimationStateMachineAnimationAction
+    - !IsWeightless
+    action: !Rolling
 
 - type: animationStateMachine
   id: HoppingAnimationStateMachine
   states:
-  - !type:AnimationStateMachineAnimationState
+  - !Animation
     conditions:
-    - !type:AnimationStateMachineIsWalkingCondition
+    - !IsWalking
       ignoreMovementInput: true
-    action: !type:HoppingAnimationStateMachineAnimationAction
+    action: !Hopping
     oneShot: true
-  timer: !type:AnimationStateMachineRandomTimeRangeTimer
+  timer: !RandomTimeRange
     minTime: 0.5
     maxTime: 2
 
 - type: animationStateMachine
   id: EyeAnimationStateMachine
   states:
-  - !type:AnimationStateMachineSpriteChangeState
+  - !SpriteChange
     conditions:
-    - !type:AnimationStateMachineHasMobStateCondition
+    - !HasMobState
       state: Alive
-    action: !type:EyeBlinkAnimationStateMachineSpriteChangeAction
+    action: !EyeBlink
     exitPeriod: 0.1
-  timer: !type:AnimationStateMachineRandomTimeRangeTimer
+  timer: !RandomTimeRange
     minTime: 0.5
     maxTime: 5

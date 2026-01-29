@@ -7,7 +7,7 @@ public sealed partial class AnimationStateMachineStateSpriteChange : AnimationSt
 {
     private static readonly AnimationStateMachineActionSpriteChangeBase NullAction = new AnimationStateMachineSpriteChangeStateActionNull();
 
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineActionSpriteChangeBase>))]
     public AnimationStateMachineActionSpriteChangeBase Action = NullAction;
 
     private EntityManager _entityManager;

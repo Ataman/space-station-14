@@ -15,14 +15,14 @@ public sealed partial class AnimationStateMachinePrototype : IPrototype
     /// <summary>
     /// A collection of possible states for this component.
     /// </summary>
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineStateBase>))]
     public List<AnimationStateMachineStateBase> States = [];
 
     /// <summary>
     /// Optional timer for executing an update.
     /// Setting this disables periodic condition checks.
     /// </summary>
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineTimerBase>))]
     public AnimationStateMachineTimerBase? Timer;
 
     /// <summary>

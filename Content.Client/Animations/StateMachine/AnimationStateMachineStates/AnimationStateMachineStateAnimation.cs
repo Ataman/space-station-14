@@ -14,7 +14,7 @@ public sealed partial class AnimationStateMachineStateAnimation : AnimationState
 
     private readonly List<(Type, string)> _animationCompProps = [];
 
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineActionAnimationBase>))]
     public AnimationStateMachineActionAnimationBase Action = NullAction;
 
     public string RunningAnimationKey => Action.GetType().Name + "_RUNNING";

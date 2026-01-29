@@ -9,13 +9,13 @@ public abstract partial class AnimationStateMachineStateBase
     /// <summary>
     /// A collection of conditions that must be true for this state to activate.
     /// </summary>
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineConditionBase>))]
     public AnimationStateMachineConditionBase[] Conditions = [];
 
     /// <summary>
     /// A collection of triggers that cause a conditions check.
     /// </summary>
-    [DataField]
+    [DataField(customTypeSerializer:typeof(CustomBaseTypeSerializer<AnimationStateMachineTriggerBase>))]
     public AnimationStateMachineTriggerBase[] Triggers = [];
 
     /// <summary>
