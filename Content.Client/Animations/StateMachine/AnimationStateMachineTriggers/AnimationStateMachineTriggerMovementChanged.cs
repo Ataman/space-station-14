@@ -2,7 +2,7 @@
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
 
-public sealed partial class AnimationStateMachineMovementChangedTrigger : AnimationStateMachineTrigger
+public sealed partial class AnimationStateMachineTriggerMovementChanged : AnimationStateMachineTriggerBase
 {
     private EntityManager _entities = null!;
     private InputMoverComponent? _inputMoverComponent;

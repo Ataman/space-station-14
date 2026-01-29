@@ -16,7 +16,7 @@ public abstract partial class AnimationStateMachineStateBase
     /// A collection of triggers that cause a conditions check.
     /// </summary>
     [DataField]
-    public AnimationStateMachineTrigger[] Triggers = [];
+    public AnimationStateMachineTriggerBase[] Triggers = [];
 
     /// <summary>
     /// If set to true, the state only executes its action one time instead of restarting it once the animation ends.

@@ -5,7 +5,7 @@ namespace Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
 
 [ImplicitDataDefinitionForInheritors]
 [PublicAPI]
-public abstract partial class AnimationStateMachineTrigger
+public abstract partial class AnimationStateMachineTriggerBase
 {
     private AnimationStateMachineSystem _animationStateMachineSystem;
     private Entity<AnimationStateMachineComponent> _entity;
