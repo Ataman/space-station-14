@@ -29,6 +29,6 @@ public sealed partial class AnimationStateMachinePrototype : IPrototype
     /// The default state to enter when no other state matches their conditions.
     /// </summary>
     [DataField]
-    public AnimationStateMachineStateBase DefaultState = new NullAnimationStateMachineStateBase();
+    public AnimationStateMachineStateBase DefaultState = new AnimationStateMachineStateNull();
 
 }

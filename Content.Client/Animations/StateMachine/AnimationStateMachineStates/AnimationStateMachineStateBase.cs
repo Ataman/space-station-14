@@ -40,7 +40,7 @@ public abstract partial class AnimationStateMachineStateBase
     public abstract void Exit(EntityUid ent);
 }
 
-public sealed partial class NullAnimationStateMachineStateBase : AnimationStateMachineStateBase
+public sealed partial class AnimationStateMachineStateNull : AnimationStateMachineStateBase
 {
     public override void Initialize(EntityUid ent, EntityManager entityManager) { }
     public override void Enter(EntityUid ent, bool enteredByTrigger) { }
