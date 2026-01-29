@@ -3,7 +3,7 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions.SpriteChanges;
 
-public sealed partial class EyeBlinkAnimationStateMachineSpriteChangeAction : AnimationStateMachineSpriteChangeStateAction
+public sealed partial class AnimationStateMachineActionSpriteChangeEyeBlink : AnimationStateMachineActionSpriteChangeBase
 {
     [DataField]
     public float BlinkSkinColorMultiplier = 0.9f;

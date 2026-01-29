@@ -8,14 +8,14 @@ using Robust.Shared.Animations;
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions;
 [ImplicitDataDefinitionForInheritors]
 [PublicAPI]
-public abstract partial class AnimationStateMachineSpriteChangeStateAction
+public abstract partial class AnimationStateMachineActionSpriteChangeBase
 {
     public abstract void Initialize(Entity<SpriteComponent> entity, EntityManager entityManager);
     public abstract void ExecuteSpriteChange(Entity<SpriteComponent> entity);
     public abstract void ResetSpriteChange(Entity<SpriteComponent> entity);
 }
 
-public sealed partial class NullAnimationStateMachineSpriteChangeStateAction : AnimationStateMachineSpriteChangeStateAction
+public sealed partial class AnimationStateMachineSpriteChangeStateActionNull : AnimationStateMachineActionSpriteChangeBase
 {
     public override void Initialize(Entity<SpriteComponent> entity, EntityManager entityManager) { }
 

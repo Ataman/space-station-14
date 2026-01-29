@@ -5,7 +5,7 @@ using Robust.Shared.Animations;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions.Animations;
 
-public sealed partial class HoppingAnimationStateMachineAnimationAction : AnimationStateMachineAnimationAction
+public sealed partial class AnimationStateMachineActionAnimationHopping : AnimationStateMachineActionAnimationBase
 {
     ///<summary>
     /// How high should they hop? Higher hop = more energy.

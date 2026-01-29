@@ -6,7 +6,7 @@ namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
 public sealed partial class AnimationStateMachineStateAnimation : AnimationStateMachineStateBase
 {
-    private static readonly AnimationStateMachineAnimationAction NullAction = new NullAnimationStateMachineAnimationAction();
+    private static readonly AnimationStateMachineActionAnimationBase NullAction = new NullAnimationStateMachineAnimationAction();
 
     private AnimationPlayerSystem _animationPlayerSystem;
     private AnimationStateMachineSystem _animationStateMachineSystem;
@@ -15,7 +15,7 @@ public sealed partial class AnimationStateMachineStateAnimation : AnimationState
     private readonly List<(Type, string)> _animationCompProps = [];
 
     [DataField]
-    public AnimationStateMachineAnimationAction Action = NullAction;
+    public AnimationStateMachineActionAnimationBase Action = NullAction;
 
     public string RunningAnimationKey => Action.GetType().Name + "_RUNNING";
     public string StopAnimationKey => Action.GetType().Name + "_STOP";

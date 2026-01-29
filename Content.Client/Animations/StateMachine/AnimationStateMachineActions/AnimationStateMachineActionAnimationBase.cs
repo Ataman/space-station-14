@@ -7,7 +7,7 @@ using Robust.Shared.Animations;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions;
 [ImplicitDataDefinitionForInheritors]
-public abstract partial class AnimationStateMachineAnimationAction
+public abstract partial class AnimationStateMachineActionAnimationBase
 {
     ///<summary>
     /// Should this action be restarted on trigger?
@@ -63,7 +63,7 @@ public abstract partial class AnimationStateMachineAnimationAction
     };
 }
 
-public sealed partial class NullAnimationStateMachineAnimationAction : AnimationStateMachineAnimationAction
+public sealed partial class NullAnimationStateMachineAnimationAction : AnimationStateMachineActionAnimationBase
 {
     protected override Animation? GetNextAnimation(AppearanceSystem appearanceSystem, EntityUid entity, bool restarting)
     {

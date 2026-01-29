@@ -6,7 +6,7 @@ using Robust.Shared.Animations;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineActions.Animations;
 
-public sealed partial class RollingAnimationStateMachineAnimationAction : AnimationStateMachineAnimationAction
+public sealed partial class AnimationStateMachineActionAnimationRolling : AnimationStateMachineActionAnimationBase
 {
     ///<summary>
     /// How high should they hop during the waddle? Higher hop = more energy.

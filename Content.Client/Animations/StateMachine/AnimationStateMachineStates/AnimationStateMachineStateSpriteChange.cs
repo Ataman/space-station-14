@@ -5,10 +5,10 @@ namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
 public sealed partial class AnimationStateMachineStateSpriteChange : AnimationStateMachineStateBase
 {
-    private static readonly AnimationStateMachineSpriteChangeStateAction NullAction = new NullAnimationStateMachineSpriteChangeStateAction();
+    private static readonly AnimationStateMachineActionSpriteChangeBase NullAction = new AnimationStateMachineSpriteChangeStateActionNull();
 
     [DataField]
-    public AnimationStateMachineSpriteChangeStateAction Action = NullAction;
+    public AnimationStateMachineActionSpriteChangeBase Action = NullAction;
 
     private EntityManager _entityManager;
 
