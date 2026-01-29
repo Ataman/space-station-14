@@ -2,7 +2,7 @@
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineTimers;
 
-public sealed partial class AnimationStateMachineRandomTimeRangeTimer : AnimationStateMachineTimer
+public sealed partial class AnimationStateMachineTimerRandomTimeRange : AnimationStateMachineTimerBase
 {
     [DataField]
     public TimeSpan MinTime;

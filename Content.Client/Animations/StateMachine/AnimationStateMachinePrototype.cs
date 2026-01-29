@@ -23,7 +23,7 @@ public sealed partial class AnimationStateMachinePrototype : IPrototype
     /// Setting this disables periodic condition checks.
     /// </summary>
     [DataField]
-    public AnimationStateMachineTimer? Timer;
+    public AnimationStateMachineTimerBase? Timer;
 
     /// <summary>
     /// The default state to enter when no other state matches their conditions.

@@ -5,7 +5,7 @@ namespace Content.Client.Animations.StateMachine.AnimationStateMachineTimers;
 
 [ImplicitDataDefinitionForInheritors]
 [PublicAPI]
-public abstract partial class AnimationStateMachineTimer
+public abstract partial class AnimationStateMachineTimerBase
 {
     public abstract TimeSpan GetNextPeriod(IRobustRandom random);
 }

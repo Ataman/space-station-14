@@ -32,7 +32,7 @@ internal sealed class AnimationStateMachineInstance
 {
     internal ProtoId<AnimationStateMachinePrototype> Prototype = default;
     internal AnimationStateMachineStateBase[] States = [];
-    internal AnimationStateMachineTimer? Timer = null;
+    internal AnimationStateMachineTimerBase? Timer = null;
     internal AnimationStateMachineStateBase ActiveState = new AnimationStateMachineStateNull();
     internal TimeSpan ActiveStateExitTime = TimeSpan.Zero;
 
