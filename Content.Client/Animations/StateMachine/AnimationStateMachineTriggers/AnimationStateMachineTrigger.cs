@@ -9,10 +9,10 @@ public abstract partial class AnimationStateMachineTrigger
 {
     private AnimationStateMachineSystem _animationStateMachineSystem;
     private Entity<AnimationStateMachineComponent> _entity;
-    private AnimationStateMachineState _parentState;
+    private AnimationStateMachineStateBase _parentState;
     private bool _triggered = false;
 
-    internal void InitializeInternal(EntityManager entityManager, Entity<AnimationStateMachineComponent> entity, AnimationStateMachineState state)
+    internal void InitializeInternal(EntityManager entityManager, Entity<AnimationStateMachineComponent> entity, AnimationStateMachineStateBase state)
     {
         _animationStateMachineSystem = entityManager.System<AnimationStateMachineSystem>();
         _entity = entity;

@@ -4,7 +4,7 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
-public sealed partial class AnimationStateMachineAnimationState : AnimationStateMachineState
+public sealed partial class AnimationStateMachineStateAnimation : AnimationStateMachineStateBase
 {
     private static readonly AnimationStateMachineAnimationAction NullAction = new NullAnimationStateMachineAnimationAction();
 

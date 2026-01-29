@@ -35,7 +35,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         SubscribeLocalEvent<AnimationPlayerComponent, AnimationCompletedEvent>(OnAnimationCompleted);
     }
 
-    internal void OnTrigger(AnimationStateMachineState state, Entity<AnimationStateMachineComponent> entity)
+    internal void OnTrigger(AnimationStateMachineStateBase state, Entity<AnimationStateMachineComponent> entity)
     {
         foreach (var stateMachine in entity.Comp.ActiveStateMachines)
         {
@@ -76,7 +76,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         AnimationStateMachineInstance? instance = null;
         foreach (var machine in comp.ActiveStateMachines)
         {
-            if (machine.ActiveState is AnimationStateMachineAnimationState animState && animState.RunningAnimationKey == args.Key)
+            if (machine.ActiveState is AnimationStateMachineStateAnimation animState && animState.RunningAnimationKey == args.Key)
             {
                 instance = machine;
             }
@@ -108,7 +108,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
     /// </summary>
     private void InitStateMachine(Entity<AnimationStateMachineComponent> ent, ProtoId<AnimationStateMachinePrototype> protoId)
     {
-        List<AnimationStateMachineState> states = [];
+        List<AnimationStateMachineStateBase> states = [];
 
         var proto = _prototypeManager.Index(protoId);
 
@@ -226,7 +226,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         }
     }
 
-    private bool EvaluateConditions(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineState state, TimeSpan nextUpdate)
+    private bool EvaluateConditions(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineStateBase state, TimeSpan nextUpdate)
     {
         foreach (var cond in state.Conditions)
         {
@@ -242,7 +242,7 @@ public sealed class AnimationStateMachineSystem : VisualizerSystem<AnimationStat
         return true;
     }
 
-    private void EvaluateTriggers(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineState state)
+    private void EvaluateTriggers(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineStateBase state)
     {
         foreach (var trigger in state.Triggers)
         {

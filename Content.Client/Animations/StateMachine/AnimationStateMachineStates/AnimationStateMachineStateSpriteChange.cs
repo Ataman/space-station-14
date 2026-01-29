@@ -3,7 +3,7 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
-public sealed partial class AnimationStateMachineSpriteChangeState : AnimationStateMachineState
+public sealed partial class AnimationStateMachineStateSpriteChange : AnimationStateMachineStateBase
 {
     private static readonly AnimationStateMachineSpriteChangeStateAction NullAction = new NullAnimationStateMachineSpriteChangeStateAction();
 

@@ -31,12 +31,12 @@ public sealed partial class AnimationStateMachineComponent : Component
 internal sealed class AnimationStateMachineInstance
 {
     internal ProtoId<AnimationStateMachinePrototype> Prototype = default;
-    internal AnimationStateMachineState[] States = [];
+    internal AnimationStateMachineStateBase[] States = [];
     internal AnimationStateMachineTimer? Timer = null;
-    internal AnimationStateMachineState ActiveState = new NullAnimationStateMachineState();
+    internal AnimationStateMachineStateBase ActiveState = new NullAnimationStateMachineStateBase();
     internal TimeSpan ActiveStateExitTime = TimeSpan.Zero;
 
-    internal void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineState newState, bool switchedByTrigger)
+    internal void SwitchState(Entity<AnimationStateMachineComponent> ent, AnimationStateMachineStateBase newState, bool switchedByTrigger)
     {
         if (ActiveState == newState)
             return;

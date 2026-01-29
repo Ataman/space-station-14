@@ -4,7 +4,7 @@ using Content.Client.Animations.StateMachine.AnimationStateMachineTriggers;
 namespace Content.Client.Animations.StateMachine.AnimationStateMachineStates;
 
 [Serializable, ImplicitDataDefinitionForInheritors]
-public abstract partial class AnimationStateMachineState
+public abstract partial class AnimationStateMachineStateBase
 {
     /// <summary>
     /// A collection of conditions that must be true for this state to activate.
@@ -40,7 +40,7 @@ public abstract partial class AnimationStateMachineState
     public abstract void Exit(EntityUid ent);
 }
 
-public sealed partial class NullAnimationStateMachineState : AnimationStateMachineState
+public sealed partial class NullAnimationStateMachineStateBase : AnimationStateMachineStateBase
 {
     public override void Initialize(EntityUid ent, EntityManager entityManager) { }
     public override void Enter(EntityUid ent, bool enteredByTrigger) { }

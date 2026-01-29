@@ -16,7 +16,7 @@ public sealed partial class AnimationStateMachinePrototype : IPrototype
     /// A collection of possible states for this component.
     /// </summary>
     [DataField]
-    public List<AnimationStateMachineState> States = [];
+    public List<AnimationStateMachineStateBase> States = [];
 
     /// <summary>
     /// Optional timer for executing an update.
@@ -29,6 +29,6 @@ public sealed partial class AnimationStateMachinePrototype : IPrototype
     /// The default state to enter when no other state matches their conditions.
     /// </summary>
     [DataField]
-    public AnimationStateMachineState DefaultState = new NullAnimationStateMachineState();
+    public AnimationStateMachineStateBase DefaultState = new NullAnimationStateMachineStateBase();
 
 }
