@@ -19,6 +19,13 @@ namespace Content.Client.Instruments.UI;
 [GenerateTypedNameReferences]
 public sealed partial class FileMidiSource : InstrumentMidiSourceBase
 {
+    private enum LoopMode
+    {
+        Off,
+        Single,
+        All
+    }
+
     private const double RecoveryGracePeriod = 2.0;
 
     [Dependency] private IRobustRandom _random = default!;
@@ -50,6 +57,7 @@ public sealed partial class FileMidiSource : InstrumentMidiSourceBase
     private bool _isMidiFileDialogueWindowOpen;
     private bool _selectedInternally;
     private float _timeSinceLastRecoverAttempt;
+    private LoopMode _loopMode = LoopMode.Off;
 
     /// <summary>
     /// The Instrument playing the tracks. This is needed for the UI to read out current track time.
@@ -114,7 +122,7 @@ public sealed partial class FileMidiSource : InstrumentMidiSourceBase
             PlaybackSlider.Disabled = true;
 
             // My patience with the InstrumentSystem ran out, the system will be asked to play tracks until it behaves.
-            if (!IsPlaying)
+            if (!IsPlaying && _loopMode == LoopMode.All)
                 return;
 
             _timeSinceLastRecoverAttempt += args.DeltaSeconds;
@@ -248,10 +256,21 @@ public sealed partial class FileMidiSource : InstrumentMidiSourceBase
 
     private void OnLoopButtonToggled(ButtonToggledEventArgs obj)
     {
-        if (LoopButton.Pressed && ShuffleButton.Pressed)
-            ShuffleButton.Pressed = false;
+        _loopMode = _loopMode switch
+        {
+            LoopMode.Off => LoopMode.Single,
+            LoopMode.Single => LoopMode.All,
+            LoopMode.All => LoopMode.Off,
+            _ => _loopMode,
+        };
 
-        LoopingToggled?.Invoke(LoopButton.Pressed);
+        if (_loopMode != LoopMode.Off)
+            LoopButton.Pressed = true;
+
+        // TODO: Localize
+        LoopButton.Text = $"Mode: {_loopMode.ToString()}";
+
+        LoopingToggled?.Invoke(_loopMode == LoopMode.Single);
     }
 
     private void OnShuffleButtonPressed(ButtonEventArgs obj)
@@ -259,7 +278,6 @@ public sealed partial class FileMidiSource : InstrumentMidiSourceBase
         if (ShuffleButton.Pressed && LoopButton.Pressed)
         {
             LoopingToggled?.Invoke(false);
-            LoopButton.Pressed = false;
         }
 
         if (obj.Button.Pressed && !TrackList.GetSelected().Any())
@@ -401,6 +419,13 @@ public sealed partial class FileMidiSource : InstrumentMidiSourceBase
     /// <remarks>Selecting another track causes its playback if <see cref="IsPlaying" /> is true.</remarks>
     public void SelectNextTrack()
     {
+        // Only select next track when loop mode is set to all.
+        if (_loopMode != LoopMode.All)
+        {
+            IsPlaying = false;
+            return;
+        }
+
         // Only proceed if file panel is active.
         if (!Enabled)
             return;
